@@ -1,4 +1,4 @@
-CC = cc -Wall -Wextra -Werror #-g -fsanitize=address
+CC = cc -Wall -Wextra #-Werror #-g -fsanitize=address
 INC = -I $(HEADERDIR)
 LIBFT := ./libft
 LIBRARY = libminishell.a
@@ -7,6 +7,7 @@ SRC = minishell.c \
 executable.c \
 ft_split2.c \
 ft_strcmp.c \
+heredoc.c \
 builtin/cd.c \
 builtin/exit.c \
 builtin/echo.c \

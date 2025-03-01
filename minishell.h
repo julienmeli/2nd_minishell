@@ -14,6 +14,13 @@
 
 #define BUFFER_SIZE 1024
 
+# define HEREDOC_NAME "/tmp/.minishell_heredoc_"
+
+typedef struct	s_store
+{
+	int	memalloc_for_env;
+}		t_store;
+
 int     execute_command(char **args);
 char    **ft_split2(char *str, char *charset);
 
@@ -23,7 +30,7 @@ int     jsh_cd(char **args);
 int     jsh_echo(char **args);
 int     jsh_env(void);
 int     jsh_exit(char **args);
-int     jsh_export(char **args);
+int     jsh_export(char **args, t_store *data);
 int     jsh_pwd(void);
 int     jsh_unset(char **args);
 int     clean_exit(char **args, int exit);
@@ -40,5 +47,11 @@ void    ft_free(char **array);
 
 //ft_strcmp.c
 int     ft_strcmp(const char *s1, const char *s2);
+
+//heredoc.c
+int	ft_heredoc_detection(char **args);
+char	*get_delimiter(char **args, int i);
+void	handle_heredoc(char *delimiter);
+void	execute_command_in_heredoc(char **args);
 
 #endif
