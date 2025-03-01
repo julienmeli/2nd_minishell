@@ -1,0 +1,374 @@
+function test_builtin_echo()
+{
+	print_h3 "ECHO"
+	exec_test 'ECHO'
+	exec_test 'Echo'
+	exec_test 'echo'
+	exec_test 'echo hello'
+	exec_test 'echo hello'
+	exec_test 'echo hello world'
+	exec_test 'echo hello      world'
+	exec_test 'echo                      hello world'
+	exec_test 'echo hello world                '
+	exec_test 'echo helololollllolllolol loollolllololllol lllol  looololololollllloooolll'
+	exec_test 'echo helololollllolllolol                                 loollolllololllol                   lllol                looololololollllloooolll'
+	exec_test 'echo -n'
+	exec_test 'echo -n hello world'
+	exec_test 'echo hello      world'
+	exec_test 'echo                      hello world'
+	exec_test 'echo -n hello world                '
+	exec_test 'echo -n helololollllolllolol loollolllololllol lllol  looololololollllloooolll'
+	exec_test 'echo -n helololollllolllolol                                 loollolllololllol                   lllol                looololololollllloooolll'
+	exec_test 'echo hello -n'
+	exec_test '             echo                 hello                world'
+	exec_test '             echo             -n                  hello               world                       '
+	exec_test "echo a '' b '' c '' d"
+	exec_test 'echo a "" b "" c "" d'
+	exec_test "echo -n a '' b '' c '' d"
+	exec_test 'echo -n a "" b "" c "" d'
+	exec_test 'echo -nhello world'
+	exec_test 'echo -n -n -n hello world'
+	exec_test 'echo -n -n -nnnn -nnnnm'
+	exec_test 'echo a	-nnnnhello'
+	exec_test 'echo -n -nnn hello -n'
+	exec_test 'echo a	hello -nhello'
+}
+
+function test_builtin_echo_no_env()
+{
+	print_h3 "ECHO (no environment)"
+	exec_test_no_env 'unset PATH; echo hello world'
+	exec_test_no_env 'unset PATH; echo $USER'
+	exec_test_no_env 'unset PATH; echo $PATH'
+}
+
+function test_builtin_env()
+{
+	print_h3 "ENV"
+	exec_test 'ENV | sort | grep -v SHLVL | grep -v _='
+	exec_test 'Env | sort | grep -v SHLVL | grep -v _='
+	exec_test 'env | sort | grep -v SHLVL | grep -v _='
+	exec_test 'env | wc -l'
+	exec_test 'env | grep PATH'
+}
+
+function test_builtin_env_no_env()
+{
+	print_h3 "ENV (no environment)"
+	exec_test_no_env 'unset PATH; env | grep PATH'
+	exec_test_no_env 'unset PATH; env | grep USER'
+	exec_test_no_env 'unset PATH; env | grep SHELL'
+	exec_test_no_env 'unset PATH; env | grep PWD'
+}
+
+function test_builtin_export()
+{
+	print_h3 "EXPORT"
+	exec_test 'EXPORT'
+	exec_test 'Export'
+	exec_test 'export ""'
+	exec_test 'export 42'
+	exec_test 'export 42; env | grep 42'
+	exec_test 'export ='
+	exec_test 'export =; env | grep = | wc -l'
+	exec_test 'export A'
+	exec_test 'export A=; echo $A'
+	exec_test 'export A=a; echo $A'
+	exec_test 'export A=a B=b C=c; echo $A$B$C'
+	exec_test 'export A=a B=b C=c; export A=c B=a C=b; echo $A$B$C'
+	exec_test 'export A=a B=b C=c D=d E=e F=f G=g H=h I=i J=j K=k L=l M=m N=n O=o P=p Q=q R=r S=s T=t U=u V=v W=w X=x Y=y Z=z; echo $A$B$C$D$E$F$G$H$I$J$K$L$M$N$O$P$Q$R$S$T$U$V$W$X$Y$Z'
+	exec_test 'export A==a; echo $A'
+	exec_test 'export A===a; echo $A'
+	exec_test 'export A====a; echo $A'
+	exec_test 'export A=====a; echo $A'
+	exec_test 'export A======a; echo $A'
+	exec_test 'export A=a=a=a=a=a; echo $A'
+	exec_test 'export HELLOWORLD=a; echo $HELLOWORLD'
+	exec_test 'export helloworld=a; echo $helloworld'
+	exec_test 'export hello_world=a; echo $hello_world'
+	exec_test 'export HELLOWORLD1=a; echo $HELLOWORLD1'
+	exec_test 'export H1ELL_0_W123Orld_a=a; echo $H1ELL_0_W123Orld_a'
+	exec_test 'export a0123456789=a; echo $a0123456789'
+	exec_test 'export abcdefghijklmnopqrstuvwxyz=a; echo $abcdefghijklmnopqrstuvwxyz'
+	exec_test 'export __________________________=a; echo $__________________________'
+	exec_test 'export _hello_=a; echo $_hello_'
+	exec_test 'export 1'
+	exec_test 'export 1='
+	exec_test 'export 1=a'
+	exec_test 'export HELLOWORLD =a'
+	exec_test 'export HELLOWORLD= a'
+	exec_test "export HELLO\'WORLD\'=a"
+	exec_test "export HELLO\"WORLD\"=a"
+	exec_test "export HELLO\$WORLD=a"
+	exec_test "export HELLO_WORLD=a"
+	exec_test "export A='hello this world is wonderful'; echo \$A"
+	exec_test "export A=\"hello this world is wonderful\"; echo \$A"
+	exec_test "export A 'asdf ' B ' asdf asdf asd f' ' asdf ' '' 'asdf ' C; echo \$A\$B\$C"
+	exec_test "export 'asdf ' B ' asdf asdf asd f' ' asdf ' '' 'asdf ' C; echo \$A\$B\$C"
+	exec_test "export A 'asdf ' B ' asdf asdf asd f' ' asdf ' '' 'asdf '; echo \$A\$B\$C"
+	exec_test "export A B C; echo \$A\$B\$C"
+	exec_test "export 'HELLO@'=hello"
+	exec_test "export \"HELLO'\"=hello"
+	exec_test "export 'HELLO\"'=hello"
+	exec_test "export 'HELLO$'=hello"
+	exec_test "export 'HELLO!'=hello"
+	exec_test "export 'HELLO|'=hello"
+	exec_test "export 'HELLO&'=hello"
+	exec_test "export 'HELLO\\'=hello"
+	exec_test 'export ALPHA="abc def ghi"; echo $ALPHA'
+	exec_test "export ALPHA='abc def ghi'; echo \$ALPHA"
+	exec_test 'export DIGITS="0 1 2 3 4 5 6 7 8 9"; echo $DIGITS'
+	exec_test "export DIGITS='0 1 2 3 4 5 6 7 8 9'; echo \$DIGITS"
+	exec_test 'export DIGITS=0 1 2 3 4 5 6 7 8 9; echo $DIGITS'
+}
+
+function test_builtin_export_no_env()
+{
+	print_h3 "EXPORT (no environment)"
+	exec_test_no_env 'unset PATH; export hello=42'
+	exec_test_no_env 'unset PATH; export 42=hello'
+	exec_test_no_env 'unset PATH; export hello=42; echo $hello'
+	exec_test_no_env 'unset PATH; export PATH=/usr/bin:/sbin/; ls'
+}
+
+function test_builtin_unset()
+{
+	print_h3 "UNSET"
+	exec_test 'UNSET'
+	exec_test 'Unset'
+	exec_test 'unset'
+	exec_test 'unset PATH'
+	exec_test 'unset PATH USER; echo $PATH; echo $USER'
+	exec_test 'unset PATH; echo $PATH'
+	exec_test 'unset PATH; ls'
+	exec_test 'unset NOT_A_VAR'
+	exec_test 'unset ""'
+	exec_test "unset ''"
+	exec_test 'export A=a; unset A; echo $A'
+	exec_test 'export A=a A2=a; unset A; echo $A $A2'
+	exec_test "export A=a; unset 'A '; echo \$A"
+	exec_test "export A=a; unset A=; echo \$A"
+	exec_test "export A=a; unset 'A='; echo \$A"
+	exec_test 'export A=a B=b C=c; unset A B C; echo $A$B$C'
+	exec_test "export A=a B=b C=c; unset A 'asdf ' B ' asdf asdf asd f' ' asdf ' '' 'asdf ' C"
+	exec_test "export A=a B=b C=c; unset A 'asdf ' B ' asdf asdf asd f' ' asdf ' '' 'asdf ' C; echo \$A\$B\$C"
+	exec_test "export A=a B=b C=c; unset 'asdf ' B ' asdf asdf asd f' ' asdf ' '' 'asdf ' C"
+	exec_test "export A=a B=b C=c; unset 'asdf ' B ' asdf asdf asd f' ' asdf ' '' 'asdf ' C; echo \$A\$B\$C"
+	exec_test "export A=a B=b C=c; unset A 'asdf ' B ' asdf asdf asd f' ' asdf ' '' 'asdf '"
+	exec_test "export A=a B=b C=c; unset A 'asdf ' B ' asdf asdf asd f' ' asdf ' '' 'asdf '; echo \$A\$B\$C"
+	exec_test 'export A=a B=b C=c; unset A'
+	exec_test 'export A=a B=b C=c; unset A; echo $A$B$C'
+	exec_test 'export A=a B=b C=c; unset B'
+	exec_test 'export A=a B=b C=c; unset B; echo $A$B$C'
+	exec_test 'export A=a B=b C=c; unset C'
+	exec_test 'export A=a B=b C=c; unset C; echo $A$B$C'
+	exec_test "unset 'HELLO@'"
+	exec_test "unset \"HELLO'\""
+	exec_test "unset 'HELLO\"'"
+	exec_test "unset 'HELLO$'"
+	exec_test "unset 'HELLO!'"
+	exec_test "unset 'HELLO|'"
+	exec_test "unset 'HELLO&'"
+	exec_test "unset 'HELLO\\'"
+}
+
+function test_builtin_unset_no_env()
+{
+	print_h3 "UNSET (no environment)"
+	exec_test_no_env 'unset PATH'
+	exec_test_no_env 'unset PATH; export hello=42; unset hello'
+	exec_test_no_env 'unset PATH; export hello=42; unset hello; echo $hello'
+	exec_test_no_env 'unset PATH; unset USER'
+}
+
+function test_builtin_pwd()
+{
+	print_h3 "PWD"
+	exec_test 'PWD'
+	exec_test 'Pwd'
+	exec_test 'pwd'
+	exec_test 'pwd | cat -e'	
+	exec_test 'pwd hello'
+	exec_test 'pwd 123'
+	exec_test 'pwd 1 2 x 3 hello'
+	exec_test 'pwd .'
+	exec_test 'pwd ..'
+	exec_test 'unset PWD; pwd | cat -e'
+	exec_test 'unset OLDPWD; pwd | cat -e'
+	exec_test 'unset PWD OLDPWD; pwd | cat -e'
+	exec_test "export PWD='hello/world'; pwd | cat -e"
+	exec_test "export PWD='/hello/world/'; pwd | cat -e"
+	exec_test "export PWD='/usr/bin/'; pwd | cat -e"
+	exec_test "export OLDPWD=abc/def; pwd | cat -e"
+	exec_test "export PWD=hello/world OLDPWD=abc/def; pwd | cat -e"
+	exec_test 'mkdir a a/b; cd a/b; rm -rf ../../a; pwd'
+}
+
+function test_builtin_pwd_no_env()
+{
+	print_h3 "PWD (no environment)"
+	exec_test_no_env 'unset PATH; pwd'
+	exec_test_no_env 'unset PATH; pwd'
+	exec_test_no_env 'unset PATH; unset PWD; pwd'
+	exec_test_no_env 'unset PATH; unset OLDPWD; pwd'
+	exec_test_no_env 'unset PATH; unset PWD OLDPWD; pwd'
+	exec_test_no_env "unset PATH; export PWD='hello/world'; pwd"
+	exec_test_no_env "unset PATH; export PWD='/hello/world/'; pwd"
+	exec_test_no_env "unset PATH; export PWD='/usr/bin/'; pwd"
+}
+
+function test_builtin_cd()
+{
+	print_h3 "CD"
+	exec_test 'CD'
+	exec_test 'CD; pwd'
+	exec_test 'Cd'
+	exec_test 'Cd; pwd'
+	exec_test 'cd'
+	exec_test 'cd; pwd'
+	exec_test 'cd .'
+	exec_test 'cd .; pwd'
+	exec_test 'cd ..'
+	exec_test 'cd ..; pwd'
+	exec_test "cd $D_EXISTS"
+	exec_test "cd $D_EXISTS; pwd"
+	exec_test 'cd /dev'
+	exec_test 'cd /dev; pwd'
+	exec_test 'cd /Users'
+	exec_test 'cd /Users; pwd'
+	exec_test 'cd fake_dir'
+	exec_test 'cd fake_dir; pwd'
+	exec_test "cd $D_FORBIDDEN"
+	exec_test "cd $D_FORBIDDEN; pwd"
+	exec_test "cd $F_EXISTING"
+	exec_test "cd $F_EXISTING; pwd"
+	exec_test "cd $F_FORBIDDEN"
+	exec_test "cd $F_FORBIDDEN; pwd"
+	exec_test 'cd ../../../../../../../../../../../../../../../../../../../../../../'
+	exec_test 'cd ../../../../../../../../../../../../../../../../../../../../../../; pwd'
+	exec_test 'cd $HOME'
+	exec_test 'cd $HOME; pwd'
+	exec_test 'unset HOME; cd $HOME'
+	exec_test 'unset HOME; cd $HOME; pwd'
+	exec_test 'unset HOME; cd'
+	exec_test 'unset HOME; cd; pwd'
+	exec_test 'mkdir a a/b; cd a/b; rm -rf ../../a; cd ..'
+	exec_test 'mkdir a a/b; cd a/b; rm -rf ../../a; unset PWD OLDPWD; cd ..'
+}
+
+function test_builtin_cd_no_env()
+{
+	print_h3 "CD (no environment)"
+	exec_test_no_env 'unset PATH; cd'
+	exec_test_no_env 'unset PATH; cd; pwd'
+	exec_test_no_env 'unset PATH; cd .'
+	exec_test_no_env 'unset PATH; cd .; pwd'
+	exec_test_no_env 'unset PATH; cd ..'
+	exec_test_no_env 'unset PATH; cd ..; pwd'
+	exec_test_no_env "unset PATH; cd $D_EXISTS"
+	exec_test_no_env "unset PATH; cd $D_EXISTS; pwd"
+	exec_test_no_env 'unset PATH; cd /dev'
+	exec_test_no_env 'unset PATH; cd /dev; pwd'
+	exec_test_no_env 'unset PATH; cd /Users'
+	exec_test_no_env 'unset PATH; cd /Users; pwd'
+	exec_test_no_env 'unset PATH; cd fake_dir'
+	exec_test_no_env 'unset PATH; cd fake_dir; pwd'
+	exec_test_no_env "unset PATH; cd $D_FORBIDDEN"
+	exec_test_no_env "unset PATH; cd $D_FORBIDDEN; pwd"
+	exec_test_no_env "unset PATH; cd $F_EXISTING"
+	exec_test_no_env "unset PATH; cd $F_EXISTING; pwd"
+	exec_test_no_env "unset PATH; cd $F_FORBIDDEN"
+	exec_test_no_env "unset PATH; cd $F_FORBIDDEN; pwd"
+	exec_test_no_env 'unset PATH; cd $HOME'
+	exec_test_no_env 'unset PATH; cd $HOME; pwd'
+	exec_test_no_env 'unset PATH; unset HOME; cd $HOME'
+	exec_test_no_env 'unset PATH; unset HOME; cd $HOME; pwd'
+	exec_test_no_env 'unset PATH; unset HOME; cd'
+	exec_test_no_env 'unset PATH; unset HOME; cd; pwd'
+}
+
+function test_builtin_exit()
+{
+	print_h3 "EXIT"
+	exec_test 'exit'
+	exec_test 'Exit'
+	exec_test 'EXIT'
+	exec_test 'exit 42'
+	exec_test 'exit 42; echo "Should have exited."'
+	exec_test 'exit 240'
+	exec_test 'exit +42'
+	exec_test 'exit -42'
+	exec_test 'exit 00000000000000000000000000000000000000000000001'
+	exec_test 'exit 00000000000000000000000000000000000000000000000'
+	exec_test 'exit -00000000000000000000000000000000000000000000001'
+	exec_test 'exit -00000000000000000000000000000000000000000000000'
+	exec_test 'exit abc'
+	exec_test 'exit abc; echo "Should have exited."'
+	exec_test 'exit --42'
+	exec_test 'exit ++42'
+	exec_test 'exit - 42'
+	exec_test 'exit + 42'
+	exec_test 'exit "0"'
+	exec_test "exit '0'"
+	exec_test 'exit ""'
+	exec_test "exit ''"
+	exec_test 'exit " "'
+	exec_test "exit ' '"
+	exec_test "exit ' 5'"
+	exec_test "exit '\t5'"
+	exec_test "exit '\t\f\r5'"
+	exec_test "exit '5 '"
+	exec_test "exit '5\t'"
+	exec_test "exit '5\t\f\r'"
+	exec_test "exit '5     x'"
+	exec_test "exit '5\t\t\tx'"
+	exec_test 'exit 42 41'
+	exec_test 'exit 42 abc'
+	exec_test 'exit abc 42'
+	exec_test 'exit 2147483647'
+	exec_test 'exit 2147483648'
+	exec_test 'exit -2147483648'
+	exec_test 'exit -2147483649'
+	exec_test 'exit 9223372036854775807'
+	exec_test 'exit -9223372036854775808'
+	exec_test 'exit 9223372036854775808'
+	exec_test 'exit -9223372036854775810'
+	exec_test 'exit 9999999999999999999999999999999999999999999999'
+	exec_test 'exit -9999999999999999999999999999999999999999999999'
+	exec_test 'exit _0'
+	exec_test 'exit 0_'
+	exec_test "exit 5 < $F_IN1"
+	exec_test 'exit 1 | exit 0'
+	exec_test 'exit 0 | exit 1'
+	exec_test 'ls | exit'
+	exec_test 'ls | exit 42'
+	exec_test 'ls | exit 12 abc'
+	exec_test 'ls | exit abc 12'
+	exec_test 'exit | ls'
+	exec_test 'exit 42 | ls'
+	exec_test 'exit 12 abc | ls'
+	exec_test 'exit abc 12 | ls'
+	#exec_test "ls > file | exit"
+	#exec_test "ls -l > x | exit | wc -l"
+}
+
+function test_builtin_exit_no_env()
+{
+	print_h3 "EXIT (no environment)"
+	exec_test_no_env 'unset PATH; exit'
+	exec_test_no_env 'unset PATH; exit 42'
+	exec_test_no_env 'unset PATH; exit 42; echo "Should have exited."'
+	exec_test_no_env 'unset PATH; exit +42'
+	exec_test_no_env 'unset PATH; exit -42'
+	exec_test_no_env 'unset PATH; exit 00000000000000000000000000000000000000000000001'
+	exec_test_no_env 'unset PATH; exit 00000000000000000000000000000000000000000000000'
+	exec_test_no_env 'unset PATH; exit abc'
+	exec_test_no_env 'unset PATH; exit abc; echo "Should have exited."'
+	exec_test_no_env 'unset PATH; exit --42'
+	exec_test_no_env 'unset PATH; exit ++42'
+	exec_test_no_env 'unset PATH; exit - 42'
+	exec_test_no_env 'unset PATH; exit + 42'
+	exec_test_no_env 'unset PATH; exit 9999999999999999999999999999999999999999999999'
+	exec_test_no_env 'unset PATH; exit -9999999999999999999999999999999999999999999999'
+}
+
